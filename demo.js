@@ -1,4 +1,4 @@
-import delay from 'https://raw.githubusercontent.com/TomasHubelbauer/esm-delay/main/index.js';
+import delay from 'https://raw.githubusercontent.com/tomashubelbauer/esm-delay/main/index.js';
 
 void async function () {
   console.log('Watch the delay:');

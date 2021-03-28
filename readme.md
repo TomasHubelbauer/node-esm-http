@@ -7,7 +7,7 @@ support for this already.
 
 [`demo.js`](demo.js):
 ```js
-import delay from 'https://raw.githubusercontent.com/TomasHubelbauer/esm-delay/main/index.js';
+import delay from 'https://raw.githubusercontent.com/tomashubelbauer/esm-delay/main/index.js';
 
 void async function () {
   console.log('Watch the delay:');
@@ -25,7 +25,11 @@ node --experimental-loader ./index.js demo.js
 ### Copy-Paste
 
 You can just copy-paste `index.js` into your project and add it to Node's CLI
-arguments using `node --experimental-loader ./index.js`.
+arguments using:
+
+```
+node --experimental-loader ./index.js
+```
 
 ### Submodule
 
@@ -38,3 +42,11 @@ Configure Node to use the loader from the submodule directory:
 ```sh
 node --experimental-loader ./node-esm-url/index.js
 ```
+
+## To-Do
+
+### Add support for fetching dependencies of the downloaded modules
+
+The loader needs an ability to recognize `file:` specifiers whose `parentURL`
+(in `context`) is coming from `node_modules` and download those so that the
+referenced URL ESM modules can themselves depend on other modules.
