@@ -118,3 +118,7 @@ export function getSource(/** @type {string} */ url, /** @type {unknown} */ cont
   return defaultGetSource(url, context, defaultGetSource);
 }
 ```
+
+It has a problem where if the referenced module imports built-in Node packages,
+it will instead treat those imports as URL imports, too. Fix this, if you find a
+way how to.
