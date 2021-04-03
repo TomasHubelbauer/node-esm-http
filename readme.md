@@ -61,3 +61,60 @@ https://nodejs.org/api/esm.html#esm_https_loader
 The implementation is cleaner than mine and it looks like it will cleanly
 support ESM within the downloaded module. Test it and if it works well, replace
 this repository with it.
+
+I've reformatted it and improved it slightly:
+
+```javascript
+/* https://nodejs.org/api/esm.html#esm_https_loader */
+
+import https from 'https';
+
+/** @typedef {{ parentURL: string; }} Context */
+/** @typedef {(specifier: string, context: Context, defaultResolve: DefaultResolve) => void} DefaultResolve */
+
+export function resolve(/** @type {string} */ specifier, /** @type {Context} */ context, /** @type {DefaultResolve} */ defaultResolve) {
+  const { parentURL = null } = context;
+
+  if (specifier.startsWith('https://')) {
+    return { url: specifier };
+  }
+
+  if (parentURL?.startsWith('https://')) {
+    return { url: new URL(specifier, parentURL).href };
+  }
+
+  return defaultResolve(specifier, context, defaultResolve);
+}
+
+/** @typedef {(url: string, context: unknown, defaultGetFormat: DefaultGetFormat) => void} DefaultGetFormat */
+
+export function getFormat(/** @type {string} */ url, /** @type {unknown} */ context, /** @type {DefaultGetFormat} */ defaultGetFormat) {
+  if (url.startsWith('https://')) {
+    return { format: 'module' };
+  }
+
+  return defaultGetFormat(url, context, defaultGetFormat);
+}
+
+/** @typedef {(url: string, context: unknown, defaultGetSource: DefaultGetSource) => void} DefaultGetSource */
+
+export function getSource(/** @type {string} */ url, /** @type {unknown} */ context, /** @type {DefaultGetSource} */ defaultGetSource) {
+  if (url.startsWith('https://')) {
+    return new Promise((resolve, reject) => {
+      https
+        .get(url, async response => {
+          /** @type {Buffer[]} */
+          const buffers = [];
+          for await (const buffer of response) {
+            buffers.push(buffer);
+          }
+
+          resolve({ source: Buffer.concat(buffers) });
+        })
+        .on('error', reject);
+    });
+  }
+
+  return defaultGetSource(url, context, defaultGetSource);
+}
+```
